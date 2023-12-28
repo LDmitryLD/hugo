@@ -1,11 +1,14 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"os"
 	"strings"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 )
@@ -58,19 +61,19 @@ func (rp *ReverseProxy) ReverseProxy(next http.Handler) http.Handler {
 
 }
 
-// const content = ``
+const content = ``
 
-// func WorkerTest() {
-// 	t := time.NewTicker(1 * time.Second)
-// 	var b byte = 0
-// 	for {
-// 		select {
-// 		case <-t.C:
-// 			err := os.WriteFile("/app/static/_index.md", []byte(fmt.Sprintf(content, b)), 0644)
-// 			if err != nil {
-// 				log.Println(err)
-// 			}
-// 			b++
-// 		}
-// 	}
-// }
+func WorkerTest() {
+	t := time.NewTicker(1 * time.Second)
+	var b byte = 0
+	for {
+		select {
+		case <-t.C:
+			err := os.WriteFile("/app/static/_index.md", []byte(fmt.Sprintf(content, b)), 0644)
+			if err != nil {
+				log.Println(err)
+			}
+			b++
+		}
+	}
+}
