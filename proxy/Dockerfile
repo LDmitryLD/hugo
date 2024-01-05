@@ -6,6 +6,7 @@ WORKDIR /app
 
 # Копируем исходники приложения в рабочую директорию
 COPY . .
+COPY mermaid /usr/local/go/src/projects/LDmitryLD/hugoproxy/proxy/mermaid
 # Скачиваем все зависимости
 RUN go mod init test && go mod tidy
 

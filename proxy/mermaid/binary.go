@@ -1,4 +1,4 @@
-package main
+package mermaid
 
 import (
 	"fmt"
@@ -138,7 +138,7 @@ func GenerateTree(count int) *AVLTree {
 	return &AVL
 }
 
-const binaryContent = `---
+const BinaryContent = `---
 menu:
     after:
         name: binary_tree

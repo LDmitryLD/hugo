@@ -1,4 +1,4 @@
-package main
+package mermaid
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-const graphConten = `---
+const GraphConten = `---
 menu:
     after:
         name: graph
@@ -62,7 +62,7 @@ type Node struct {
 
 var forms = []string{"circle", "rect", "square", "ellipse", "round-rect", "rhombus"}
 
-func makeGraph() string {
+func MakeGraph() string {
 
 	rand.Seed(time.Now().UnixNano())
 
