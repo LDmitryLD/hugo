@@ -21,7 +21,7 @@ func geocode(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&geocodeRequest)
 	if err != nil {
 		log.Println("Ошибка при декодировании запроса: ", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
