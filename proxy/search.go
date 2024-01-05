@@ -23,15 +23,11 @@ type Address struct {
 	Lon string `json:"lon"`
 }
 
-// type SearchResponse struct {
-// 	Addresses []*model.Address `json:"addresses"`
-// }
-
 func search(w http.ResponseWriter, r *http.Request) {
 	var searchRequest SearchRequest
 	err := json.NewDecoder(r.Body).Decode(&searchRequest)
 	if err != nil {
-		log.Println("Ошибка1", err)
+		log.Println("Ошибка при декодировании запроса: ", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -41,28 +37,28 @@ func search(w http.ResponseWriter, r *http.Request) {
 		SecretKeyValue: "45710543548f02358064b56928a32789d2c71e7b",
 	}))
 
-	log.Println("[QUERY] :", searchRequest.Query)
+	//log.Println("[QUERY] :", searchRequest.Query)
 
 	addresses, err := api.Address(context.Background(), searchRequest.Query)
 	if err != nil {
-		log.Println("Ошибка2", err)
+		log.Println("Ошибка при получении адресса: ", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	log.Println("[ADDRESSES] :", addresses[0])
+	//log.Println("[ADDRESSES] :", addresses[0])
 
 	var searchResponse SearchResponse
 
 	searchResponse.Addresses = []*Address{{Lat: addresses[0].GeoLat, Lon: addresses[0].GeoLon}}
 
-	log.Println("[SEARCHRESPONSE] : ", searchResponse.Addresses[0].Lat, searchResponse.Addresses[0].Lon)
+	//log.Println("[SEARCHRESPONSE] : ", searchResponse.Addresses[0].Lat, searchResponse.Addresses[0].Lon)
 
 	err = json.NewEncoder(w).Encode(&searchResponse)
 	if err != nil {
-		log.Println("Ошибка3", err)
+		log.Println("Ошибка при кодировании ответа: ", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	log.Println("КОНЕЦ")
+	//log.Println("КОНЕЦ")
 }

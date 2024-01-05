@@ -15,12 +15,18 @@ import (
 )
 
 func main() {
-	go WorkerTest()
+	// go WorkerTest()
+
 	r := chi.NewRouter()
 
 	revProxy := NewReverseProxy("http://hugo", "1313")
+
 	r.Use(revProxy.ReverseProxy)
+
 	r.HandleFunc("/api/*", apiHandler)
+
+	r.Post("/api/address/search", search)
+	r.Post("/api/address/geocode", geocode)
 
 	http.ListenAndServe(":8080", r)
 }
