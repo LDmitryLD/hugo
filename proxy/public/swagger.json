@@ -1,0 +1,150 @@
+{
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "swagger": "2.0",
+  "info": {
+    "description": "Documentation of Geoservice API.",
+    "title": "Geoservice.",
+    "version": "1.0.0"
+  },
+  "basePath": "/",
+  "paths": {
+    "/api/address/geocode": {
+      "post": {
+        "security": [
+          {
+            "Bearer": [
+              "[]"
+            ]
+          },
+          {
+            "Response": []
+          },
+          {
+            "200": [
+              "GeocodeResponse"
+            ]
+          }
+        ],
+        "tags": [
+          "geocode"
+        ],
+        "summary": "Вычисление адресса по широте и долготе.",
+        "operationId": "GeocodeRequest",
+        "parameters": [
+          {
+            "x-go-name": "Lat",
+            "description": "Lat - широта",
+            "name": "lat",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "x-go-name": "Lng",
+            "description": "Lng - долгота",
+            "name": "lng",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses":{
+          "200":{
+            "$ref": "#/responses/GeocodeResponse"
+          }
+        }
+        
+      }
+    },
+    "/api/address/search": {
+      "post": {
+        "security": [
+          {
+            "Bearer": [
+              "[]"
+            ]
+          },
+          {
+            "Response": []
+          },
+          {
+            "200": [
+              "SearchResponse"
+            ]
+          }
+        ],
+        "description": "Вычисление местанахождения по адрессу.",
+        "tags": [
+          "search"
+        ],
+        "operationId": "SearchRequest",
+        "parameters": [
+          {
+            "x-go-name": "Query",
+            "description": "Qury - запрос, представляющий собой адрес",
+            "name": "query",
+            "in": "body",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/SearchResponse"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Address": {
+      "type": "object",
+      "properties": {
+        "lat": {
+          "type": "string",
+          "x-go-name": "Lat"
+        },
+        "lon": {
+          "type": "string",
+          "x-go-name": "Lon"
+        }
+      },
+      "x-go-package": "projects/LDmitryLD/hugoproxy/proxy"
+    }
+  },
+  "responses": {
+    "GeocodeResponse": {
+      "description": "",
+      "schema": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/Address"
+        }
+      }
+    },
+    "SearchResponse": {
+      "description": "",
+      "schema": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/Address"
+        }
+      }
+    }
+  },
+  "securityDefinitions": {
+    "Bearer": {
+      "type": "basic"
+    }
+  }
+}

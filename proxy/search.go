@@ -10,11 +10,26 @@ import (
 	"github.com/ekomobile/dadata/v2/client"
 )
 
+//swagger:route Post /api/address/search search SearchRequest
+// Вычисление местанахождения по адрессу.
+// security:
+//   - Bearer: []
+//
+// Response:
+//	200: SearchResponse
+//
+
+//swagger:parameters SearchRequest
 type SearchRequest struct {
+	//Qury - запрос, представляющий собой адрес
+	//in: body
 	Query string `json:"query"`
 }
 
+//swagger:response SearchResponse
 type SearchResponse struct {
+	// Addresses содержит список адрессов
+	// in: body
 	Addresses []*Address `json:"addresses"`
 }
 
@@ -33,11 +48,9 @@ func search(w http.ResponseWriter, r *http.Request) {
 	}
 
 	api := dadata.NewCleanApi(client.WithCredentialProvider(&client.Credentials{
-		ApiKeyValue:    "17ceca4516a27a2bc82188bbd4d524f1cec137a4",
-		SecretKeyValue: "45710543548f02358064b56928a32789d2c71e7b",
+		ApiKeyValue:    "d538755936a28def6bca48517dd287303cb0dae7",
+		SecretKeyValue: "81081aa1fa5ca90caa8a69b14947b5876f58b8db",
 	}))
-
-	//log.Println("[QUERY] :", searchRequest.Query)
 
 	addresses, err := api.Address(context.Background(), searchRequest.Query)
 	if err != nil {
@@ -46,13 +59,9 @@ func search(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//log.Println("[ADDRESSES] :", addresses[0])
-
 	var searchResponse SearchResponse
 
 	searchResponse.Addresses = []*Address{{Lat: addresses[0].GeoLat, Lon: addresses[0].GeoLon}}
-
-	//log.Println("[SEARCHRESPONSE] : ", searchResponse.Addresses[0].Lat, searchResponse.Addresses[0].Lon)
 
 	err = json.NewEncoder(w).Encode(&searchResponse)
 	if err != nil {
@@ -60,5 +69,5 @@ func search(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	//log.Println("КОНЕЦ")
+	log.Println("END")
 }

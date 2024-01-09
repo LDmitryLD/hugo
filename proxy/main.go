@@ -16,7 +16,7 @@ import (
 )
 
 func main() {
-	// go WorkerTest()
+	//go WorkerTest()
 
 	r := chi.NewRouter()
 
@@ -60,6 +60,18 @@ func (rp *ReverseProxy) ReverseProxy(next http.Handler) http.Handler {
 			// r.URL.Scheme = "http"
 			// r.URL.Host = "hugo:1313"
 			r.Host = "hugo:1313"
+
+			if strings.HasPrefix(r.URL.Path, "/swagger") {
+				log.Println("SWAGGER")
+				swaggerUI(w, r)
+				return
+			}
+
+			if strings.HasPrefix(r.URL.Path, "/public") {
+				log.Println("STATIC")
+				http.ServeFile(w, r, "/public/swagger.json")
+				return
+			}
 
 			proxy.ServeHTTP(w, r)
 		} else {

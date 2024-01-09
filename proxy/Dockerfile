@@ -7,6 +7,7 @@ WORKDIR /app
 # Копируем исходники приложения в рабочую директорию
 COPY . .
 COPY mermaid /usr/local/go/src/projects/LDmitryLD/hugoproxy/proxy/mermaid
+COPY public /usr/local/go/src/projects/LDmitryLD/hugoproxy/proxy/public
 # Скачиваем все зависимости
 RUN go mod init test && go mod tidy
 
@@ -18,7 +19,7 @@ FROM alpine:latest
 
 # Добавляем исполняемый файл из первой стадии в корневую директорию контейнера
 COPY --from=builder /app/main /main
-
+COPY --from=builder /app/public /public
 # Открываем порт 8080
 EXPOSE 8080
 

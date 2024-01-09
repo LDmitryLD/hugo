@@ -7,12 +7,30 @@ import (
 	"net/http"
 )
 
+//swagger:route Post /api/address/geocode geocode GeocodeRequest
+// Вычисление адресса по широте и долготе.
+// security:
+//   - Bearer: []
+//
+// Response:
+//	200: GeocodeResponse
+
+//swagger:parameters GeocodeRequest
 type GeocodeRequest struct {
+	// Lat - широта
+	// in: body
+	// required: true
 	Lat string `json:"lat"`
+	// Lng - долгота
+	// in: body
+	// required: true
 	Lng string `json:"lng"`
 }
 
+//swagger:response GeocodeResponse
 type GeocodeResponse struct {
+	// in: body
+	// Addresses содержит список адрессов
 	Addresses []*Address `json:"addresses"`
 }
 
@@ -35,7 +53,7 @@ func geocode(w http.ResponseWriter, r *http.Request) {
 	}
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Authorization", "Token 17ceca4516a27a2bc82188bbd4d524f1cec137a4")
+	req.Header.Set("Authorization", "Token d538755936a28def6bca48517dd287303cb0dae7")
 
 	resp, err := client.Do(req)
 	if err != nil {
