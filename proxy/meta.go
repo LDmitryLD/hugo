@@ -2,24 +2,25 @@
 //
 // Documentation of Geoservice API.
 //
-//	Version: 1.0.0
-//	Schemes:
-//	- http
-//	BasePath: /
+//		Version: 1.0.0
+//		Schemes:
+//		- http
+//		BasePath: /
 //
-//	Consumes:
-//	- application/json
+//		Consumes:
+//		- application/json
 //
-//	Produces:
-//	- application/json
+//		Produces:
+//		- application/json
 //
-//	Security:
-//	- basic
+//		Security:
+//		- basic
 //
-//
-//	SecurityDefinitions:
-//	  Bearer:
-//	    type: basic
+//		SecurityDefinitions:
+//		 Bearer:
+//	   type: apiKey
+//	   name: Authorization
+//	   in: header
 //
 // swagger:meta
 package main

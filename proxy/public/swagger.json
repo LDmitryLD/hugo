@@ -20,14 +20,6 @@
             "Bearer": [
               "[]"
             ]
-          },
-          {
-            "Response": []
-          },
-          {
-            "200": [
-              "GeocodeResponse"
-            ]
           }
         ],
         "tags": [
@@ -57,12 +49,11 @@
             }
           }
         ],
-        "responses":{
-          "200":{
+        "responses": {
+          "200": {
             "$ref": "#/responses/GeocodeResponse"
           }
         }
-        
       }
     },
     "/api/address/search": {
@@ -72,20 +63,12 @@
             "Bearer": [
               "[]"
             ]
-          },
-          {
-            "Response": []
-          },
-          {
-            "200": [
-              "SearchResponse"
-            ]
           }
         ],
-        "description": "Вычисление местанахождения по адрессу.",
         "tags": [
           "search"
         ],
+        "summary": "Вычисление местанахождения по адрессу.",
         "operationId": "SearchRequest",
         "parameters": [
           {
@@ -101,6 +84,66 @@
         "responses": {
           "200": {
             "$ref": "#/responses/SearchResponse"
+          }
+        }
+      }
+    },
+    "/api/login": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Авторизация пользователя.",
+        "operationId": "LoginRequest",
+        "parameters": [
+          {
+            "x-go-name": "Username",
+            "name": "username",
+            "in": "body",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "type": "string",
+            "x-go-name": "Password",
+            "name": "password",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/LoginResponse"
+          }
+        }
+      }
+    },
+    "/api/register": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Регистрация пользователя.",
+        "operationId": "RegisterRequest",
+        "parameters": [
+          {
+            "x-go-name": "Username",
+            "name": "username",
+            "in": "body",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "type": "string",
+            "x-go-name": "Password",
+            "name": "password",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/RegisterReponse"
           }
         }
       }
@@ -132,6 +175,22 @@
         }
       }
     },
+    "LoginResponse": {
+      "description": "",
+      "headers": {
+        "message": {
+          "type": "string"
+        }
+      }
+    },
+    "RegisterReponse": {
+      "description": "",
+      "headers": {
+        "message": {
+          "type": "string"
+        }
+      }
+    },
     "SearchResponse": {
       "description": "",
       "schema": {
@@ -144,7 +203,9 @@
   },
   "securityDefinitions": {
     "Bearer": {
-      "type": "basic"
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
     }
   }
 }

@@ -14,8 +14,7 @@ import (
 // Вычисление местанахождения по адрессу.
 // security:
 //   - Bearer: []
-//
-// Response:
+// responses:
 //	200: SearchResponse
 //
 

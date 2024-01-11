@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/jwtauth/v5"
 )
 
 func main() {
@@ -26,10 +27,21 @@ func main() {
 
 	r.HandleFunc("/api/*", apiHandler)
 
-	r.Post("/api/address/search", search)
-	r.Post("/api/address/geocode", geocode)
+	r.Post("/api/login", loginHandler)
+	r.Post("/api/register", registerHandler)
+	r.Group(func(r chi.Router) {
+		r.Use(jwtauth.Verifier(tokenAuth))
+		r.Use(jwtauth.Authenticator(tokenAuth))
 
-	http.ListenAndServe(":8080", r)
+		r.Post("/api/address/search", search)
+		r.Post("/api/address/geocode", geocode)
+	})
+
+	// надо расскомментить для проверки задания с геосервисом
+	// r.Post("/api/address/search", search)
+	// r.Post("/api/address/geocode", geocode)
+
+	log.Fatal(http.ListenAndServe(":8080", r))
 }
 
 func apiHandler(w http.ResponseWriter, r *http.Request) {
@@ -62,13 +74,11 @@ func (rp *ReverseProxy) ReverseProxy(next http.Handler) http.Handler {
 			r.Host = "hugo:1313"
 
 			if strings.HasPrefix(r.URL.Path, "/swagger") {
-				log.Println("SWAGGER")
 				swaggerUI(w, r)
 				return
 			}
 
 			if strings.HasPrefix(r.URL.Path, "/public") {
-				log.Println("STATIC")
 				http.ServeFile(w, r, "/public/swagger.json")
 				return
 			}

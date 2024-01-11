@@ -11,8 +11,7 @@ import (
 // Вычисление адресса по широте и долготе.
 // security:
 //   - Bearer: []
-//
-// Response:
+// responses:
 //	200: GeocodeResponse
 
 //swagger:parameters GeocodeRequest
