@@ -16,11 +16,6 @@ func init() {
 	tokenAuth = jwtauth.New("HS256", []byte("mysecret"), nil)
 }
 
-// type User struct {
-// 	Username string `json:"username"`
-// 	Password string `json:"password"`
-// }
-
 var users = make(map[string]string)
 
 // swagger:route POST /api/login auth LoginRequest
