@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"math/rand"
@@ -8,8 +9,10 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"os"
+	"os/signal"
 	"projects/LDmitryLD/hugoproxy/proxy/mermaid"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -41,7 +44,35 @@ func main() {
 	// r.Post("/api/address/search", search)
 	// r.Post("/api/address/geocode", geocode)
 
-	log.Fatal(http.ListenAndServe(":8080", r))
+	server := &http.Server{
+		Addr:         ":8080",
+		Handler:      r,
+		ReadTimeout:  10 * time.Second,
+		WriteTimeout: 10 * time.Second,
+	}
+
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
+
+	go func() {
+		log.Println("Starting server...")
+		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("Server errpr: %s", err.Error())
+		}
+	}()
+
+	<-sigChan
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+
+	if err := server.Shutdown(ctx); err != nil {
+		log.Fatal(err)
+	}
+
+	log.Println("Server stopeed gracefully")
+
+	//log.Fatal(http.ListenAndServe(":8080", r))
 }
 
 func apiHandler(w http.ResponseWriter, r *http.Request) {
