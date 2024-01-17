@@ -2,14 +2,14 @@
 FROM golang:1.19-alpine as builder
 
 # Устанавливаем рабочую директорию внутри контейнера
-WORKDIR /app
+WORKDIR /app 
 
 # Копируем исходники приложения в рабочую директорию
 COPY . .
-COPY mermaid /usr/local/go/src/projects/LDmitryLD/hugoproxy/proxy/mermaid
-COPY public /usr/local/go/src/projects/LDmitryLD/hugoproxy/proxy/public
+COPY public /app/public
 # Скачиваем все зависимости
-RUN go mod init test && go mod tidy
+RUN go env -w GO111MODULE=on
+RUN go mod init projects/LDmitryLD/hugoproxy/proxy && go mod tidy
 
 # Собираем приложение
 RUN go build -o main

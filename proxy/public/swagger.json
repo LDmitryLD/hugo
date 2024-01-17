@@ -29,23 +29,12 @@
         "operationId": "GeocodeRequest",
         "parameters": [
           {
-            "x-go-name": "Lat",
-            "description": "Lat - широта",
-            "name": "lat",
+            "description": "Lat - широта\nLng - долгота",
+            "name": "Body",
             "in": "body",
             "required": true,
             "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "x-go-name": "Lng",
-            "description": "Lng - долгота",
-            "name": "lng",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "type": "string"
+              "$ref": "#/definitions/GeocodeRequest"
             }
           }
         ],
@@ -72,12 +61,11 @@
         "operationId": "SearchRequest",
         "parameters": [
           {
-            "x-go-name": "Query",
             "description": "Qury - запрос, представляющий собой адрес",
-            "name": "query",
+            "name": "Body",
             "in": "body",
             "schema": {
-              "type": "string"
+              "$ref": "#/definitions/SearchRequest"
             }
           }
         ],
@@ -97,18 +85,11 @@
         "operationId": "LoginRequest",
         "parameters": [
           {
-            "x-go-name": "Username",
-            "name": "username",
+            "name": "Body",
             "in": "body",
             "schema": {
-              "type": "string"
+              "$ref": "#/definitions/LoginRequest"
             }
-          },
-          {
-            "type": "string",
-            "x-go-name": "Password",
-            "name": "password",
-            "in": "query"
           }
         ],
         "responses": {
@@ -127,18 +108,11 @@
         "operationId": "RegisterRequest",
         "parameters": [
           {
-            "x-go-name": "Username",
-            "name": "username",
+            "name": "Body",
             "in": "body",
             "schema": {
-              "type": "string"
+              "$ref": "#/definitions/RegisterRequest"
             }
-          },
-          {
-            "type": "string",
-            "x-go-name": "Password",
-            "name": "password",
-            "in": "query"
           }
         ],
         "responses": {
@@ -162,42 +136,138 @@
           "x-go-name": "Lon"
         }
       },
-      "x-go-package": "projects/LDmitryLD/hugoproxy/proxy"
+      "x-go-package": "projects/LDmitryLD/hugoproxy/proxy/internal/modules/geo/controller"
+    },
+    "GeocodeRequest": {
+      "type": "object",
+      "properties": {
+        "lat": {
+          "type": "string",
+          "x-go-name": "Lat"
+        },
+        "lng": {
+          "type": "string",
+          "x-go-name": "Lng"
+        }
+      },
+      "x-go-package": "projects/LDmitryLD/hugoproxy/proxy/internal/modules/geo/controller"
+    },
+    "GeocodeResponse": {
+      "type": "object",
+      "properties": {
+        "addresses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Address"
+          },
+          "x-go-name": "Addresses"
+        }
+      },
+      "x-go-package": "projects/LDmitryLD/hugoproxy/proxy/internal/modules/geo/controller"
+    },
+    "LoginRequest": {
+      "type": "object",
+      "properties": {
+        "password": {
+          "type": "string",
+          "x-go-name": "Password"
+        },
+        "username": {
+          "type": "string",
+          "x-go-name": "Username"
+        }
+      },
+      "x-go-package": "projects/LDmitryLD/hugoproxy/proxy/internal/modules/auth/controller"
+    },
+    "LoginResponse": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string",
+          "x-go-name": "Message"
+        },
+        "success": {
+          "type": "boolean",
+          "x-go-name": "Success"
+        }
+      },
+      "x-go-package": "projects/LDmitryLD/hugoproxy/proxy/internal/modules/auth/controller"
+    },
+    "RegisterReponse": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string",
+          "x-go-name": "Message"
+        },
+        "success": {
+          "type": "boolean",
+          "x-go-name": "Success"
+        }
+      },
+      "x-go-package": "projects/LDmitryLD/hugoproxy/proxy/internal/modules/auth/controller"
+    },
+    "RegisterRequest": {
+      "type": "object",
+      "properties": {
+        "password": {
+          "type": "string",
+          "x-go-name": "Password"
+        },
+        "username": {
+          "type": "string",
+          "x-go-name": "Username"
+        }
+      },
+      "x-go-package": "projects/LDmitryLD/hugoproxy/proxy/internal/modules/auth/controller"
+    },
+    "SearchRequest": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "string",
+          "x-go-name": "Query"
+        }
+      },
+      "x-go-package": "projects/LDmitryLD/hugoproxy/proxy/internal/modules/geo/controller"
+    },
+    "SearchResponse": {
+      "type": "object",
+      "properties": {
+        "addresses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Address"
+          },
+          "x-go-name": "Addresses"
+        }
+      },
+      "x-go-package": "projects/LDmitryLD/hugoproxy/proxy/internal/modules/geo/controller"
     }
   },
   "responses": {
     "GeocodeResponse": {
       "description": "",
       "schema": {
-        "type": "array",
-        "items": {
-          "$ref": "#/definitions/Address"
-        }
+        "$ref": "#/definitions/GeocodeResponse"
       }
     },
     "LoginResponse": {
       "description": "",
-      "headers": {
-        "message": {
-          "type": "string"
-        }
+      "schema": {
+        "$ref": "#/definitions/LoginResponse"
       }
     },
     "RegisterReponse": {
       "description": "",
-      "headers": {
-        "message": {
-          "type": "string"
-        }
+      "schema": {
+        "$ref": "#/definitions/RegisterReponse"
       }
     },
     "SearchResponse": {
       "description": "",
       "schema": {
-        "type": "array",
-        "items": {
-          "$ref": "#/definitions/Address"
-        }
+        "$ref": "#/definitions/SearchResponse"
       }
     }
   },
