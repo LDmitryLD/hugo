@@ -3,16 +3,22 @@ package controller
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"projects/LDmitryLD/hugoproxy/proxy/internal/infrastructure/responder"
+	"projects/LDmitryLD/hugoproxy/proxy/internal/modules/geo/service"
+	"projects/LDmitryLD/hugoproxy/proxy/internal/modules/geo/service/mocks"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_search(t *testing.T) {
-	geo := NewGeoController(&responder.Respond{})
+func TestGeo_Search(t *testing.T) {
+	geo := &GeoController{
+		geo:       &service.Geo{},
+		Responder: &responder.Respond{},
+	}
 	server := httptest.NewServer(http.HandlerFunc(geo.Search))
 	r := SearchRequest{
 		Query: "Москва",
@@ -34,4 +40,46 @@ func Test_search(t *testing.T) {
 	defer resp.Body.Close()
 
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
+}
+
+func TestGeo_Search_BadRequest(t *testing.T) {
+	geo := NewGeoController(service.NewGeo())
+
+	req := map[string]interface{}{"query": 123}
+	reqJSON, _ := json.Marshal(req)
+
+	s := httptest.NewServer(http.HandlerFunc(geo.Search))
+
+	resp, err := http.Post(s.URL, "application/json", bytes.NewBuffer(reqJSON))
+	if err != nil {
+		t.Fatal("ошибка при выполнении тестового запроса:", err.Error())
+	}
+
+	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+}
+
+func TestGeo_Search_Error(t *testing.T) {
+
+	geoMock := mocks.NewGeorer(t)
+
+	geoMock.On("SearchAddresses", service.SearchAddressesIn{Query: "BadQuery"}).Return(service.SearchAddressesOut{Err: errors.New("error")})
+
+	geo := NewGeoController(geoMock)
+
+	searchReq := SearchRequest{
+		Query: "BadQuery",
+	}
+
+	reqBody, _ := json.Marshal(searchReq)
+
+	s := httptest.NewServer(http.HandlerFunc(geo.Search))
+	defer s.Close()
+
+	resp, err := http.Post(s.URL, "application/json", bytes.NewBuffer(reqBody))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer resp.Body.Close()
+
+	assert.Equal(t, http.StatusInternalServerError, resp.StatusCode)
 }

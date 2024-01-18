@@ -13,7 +13,7 @@ import (
 )
 
 func main() {
-	r := router.NewRouter(modules.NewControllers())
+	r := router.NewRouter(modules.NewControllers(modules.NewSrvices()))
 
 	server := &http.Server{
 		Addr:         ":8080",

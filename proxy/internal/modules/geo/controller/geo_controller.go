@@ -1,14 +1,11 @@
 package controller
 
 import (
-	"context"
 	"encoding/json"
 	"log"
 	"net/http"
 	"projects/LDmitryLD/hugoproxy/proxy/internal/infrastructure/responder"
-
-	"github.com/ekomobile/dadata/v2"
-	"github.com/ekomobile/dadata/v2/client"
+	"projects/LDmitryLD/hugoproxy/proxy/internal/modules/geo/service"
 )
 
 type Georer interface {
@@ -18,12 +15,14 @@ type Georer interface {
 }
 
 type GeoController struct {
-	responder responder.Responder
+	geo service.Georer
+	responder.Responder
 }
 
-func NewGeoController(responder responder.Responder) Georer {
+func NewGeoController(service service.Georer) Georer {
 	return &GeoController{
-		responder: responder,
+		geo:       service,
+		Responder: &responder.Respond{},
 	}
 }
 
@@ -31,47 +30,36 @@ func (g *GeoController) Geocode(w http.ResponseWriter, r *http.Request) {
 	var geocodeRequest GeocodeRequest
 	if err := json.NewDecoder(r.Body).Decode(&geocodeRequest); err != nil {
 		log.Println("Ошибка при декодировании запроса: ", err)
-		g.responder.ErrorBadRequest(w, err)
+		g.ErrorBadRequest(w, err)
 		return
 	}
 
 	var geocodeResponse GeocodeResponse
 	geocodeResponse.Addresses = []*Address{{Lat: geocodeRequest.Lat, Lon: geocodeRequest.Lng}}
 
-	g.responder.OutputJSON(w, geocodeResponse)
+	g.OutputJSON(w, geocodeResponse)
 }
 
 func (g *GeoController) Search(w http.ResponseWriter, r *http.Request) {
 	var searchRequest SearchRequest
 	if err := json.NewDecoder(r.Body).Decode(&searchRequest); err != nil {
 		log.Println("Ошибка при декодировании запроса: ", err)
-		g.responder.ErrorBadRequest(w, err)
+		g.ErrorBadRequest(w, err)
 		return
 	}
 
-	api := dadata.NewCleanApi(client.WithCredentialProvider(&client.Credentials{
-		ApiKeyValue:    "d538755936a28def6bca48517dd287303cb0dae7",
-		SecretKeyValue: "81081aa1fa5ca90caa8a69b14947b5876f58b8db",
-	}))
-
-	addresses, err := api.Address(context.Background(), searchRequest.Query)
-	if err != nil {
-		log.Println("Ошибка при получении адресса: ", err)
-		g.responder.ErrorInternal(w, err)
+	out := g.geo.SearchAddresses(service.SearchAddressesIn{Query: searchRequest.Query})
+	if out.Err != nil {
+		log.Println("Ошибка при получении адресса: ", out.Err)
+		g.ErrorInternal(w, out.Err)
 		return
 	}
 
 	var searchResponse SearchResponse
 
-	searchResponse.Addresses = []*Address{{Lat: addresses[0].GeoLat, Lon: addresses[0].GeoLon}}
+	searchResponse.Addresses = []*Address{{Lat: out.Addresses[0].GeoLat, Lon: out.Addresses[0].GeoLon}}
 
-	// if err := json.NewEncoder(w).Encode(&searchResponse); err != nil {
-	// 	log.Println("Ошибка при кодировании ответа: ", err)
-	// 	g.responder.ErrorInternal(w, err)
-	// 	return
-	// }
-
-	g.responder.OutputJSON(w, searchResponse)
+	g.OutputJSON(w, searchResponse)
 }
 
 func (g GeoController) ApiHandler(w http.ResponseWriter, r *http.Request) {

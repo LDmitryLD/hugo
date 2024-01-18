@@ -6,14 +6,18 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"projects/LDmitryLD/hugoproxy/proxy/internal/infrastructure/responder"
+	"projects/LDmitryLD/hugoproxy/proxy/internal/modules/geo/service"
 	"testing"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_Geocode(t *testing.T) {
-	geo := NewGeoController(&responder.Respond{})
+func TestGeo_Geocode(t *testing.T) {
+	geo := &GeoController{
+		geo:       &service.Geo{},
+		Responder: &responder.Respond{},
+	}
 	server := httptest.NewServer(http.HandlerFunc(geo.Geocode))
 	r := GeocodeRequest{
 		Lat: "12.123",
@@ -39,8 +43,30 @@ func Test_Geocode(t *testing.T) {
 
 }
 
-func Test_APIHandler(t *testing.T) {
-	geo := NewGeoController(&responder.Respond{})
+func TestGeo_Geocode_BadRequest(t *testing.T) {
+	geo := NewGeoController(service.NewGeo())
+
+	req := map[string]interface{}{"lat": 123}
+	reqJSON, _ := json.Marshal(req)
+
+	s := httptest.NewServer(http.HandlerFunc(geo.Geocode))
+	defer s.Close()
+
+	resp, err := http.Post(s.URL, "application/json", bytes.NewBuffer(reqJSON))
+	if err != nil {
+		t.Fatal("ошибка при выполнении тестового запроса:", err.Error())
+	}
+	defer resp.Body.Close()
+
+	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+}
+
+func TestGeo_APIHandler(t *testing.T) {
+
+	geo := &GeoController{
+		geo:       &service.Geo{},
+		Responder: &responder.Respond{},
+	}
 	req, _ := http.NewRequest("GET", "/api/", nil)
 
 	recorder := httptest.NewRecorder()

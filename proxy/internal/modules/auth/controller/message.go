@@ -2,7 +2,7 @@ package controller
 
 type LoginRequest struct {
 	Username string `json:"username"`
-	Password string `json:"password"`
+	Password string `json:"password,omitempty"`
 }
 
 type LoginResponse struct {
