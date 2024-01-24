@@ -15,6 +15,6 @@ func TestGeo_SearchAddresses(t *testing.T) {
 
 	out := geo.SearchAddresses(in)
 
-	assert.NotEmpty(t, out.Addresses)
+	assert.NotEmpty(t, out.Address)
 	assert.Nil(t, out.Err)
 }

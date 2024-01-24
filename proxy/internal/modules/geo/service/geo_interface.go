@@ -1,8 +1,6 @@
 package service
 
-import (
-	"github.com/ekomobile/dadata/v2/api/model"
-)
+import "projects/LDmitryLD/hugoproxy/proxy/internal/models"
 
 //go:generate go run github.com/vektra/mockery/v2@v2.35.4 --name=Georer
 type Georer interface {
@@ -14,6 +12,6 @@ type SearchAddressesIn struct {
 }
 
 type SearchAddressesOut struct {
-	Addresses []*model.Address
-	Err       error
+	Address models.Address
+	Err     error
 }

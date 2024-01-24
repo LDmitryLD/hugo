@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"projects/LDmitryLD/hugoproxy/proxy/internal/infrastructure/responder"
+	"projects/LDmitryLD/hugoproxy/proxy/internal/models"
 	"projects/LDmitryLD/hugoproxy/proxy/internal/modules/geo/service"
 )
 
@@ -34,8 +35,12 @@ func (g *GeoController) Geocode(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var geocodeResponse GeocodeResponse
-	geocodeResponse.Addresses = []*Address{{Lat: geocodeRequest.Lat, Lon: geocodeRequest.Lng}}
+	// var geocodeResponse GeocodeResponse
+	// geocodeResponse.Addresses = []*Address{{Lat: geocodeRequest.Lat, Lon: geocodeRequest.Lng}}
+
+	geocodeResponse := GeocodeResponse{
+		Addresses: []*models.Address{{Lat: geocodeRequest.Lat, Lon: geocodeRequest.Lng}},
+	}
 
 	g.OutputJSON(w, geocodeResponse)
 }
@@ -55,9 +60,9 @@ func (g *GeoController) Search(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var searchResponse SearchResponse
-
-	searchResponse.Addresses = []*Address{{Lat: out.Addresses[0].GeoLat, Lon: out.Addresses[0].GeoLon}}
+	searchResponse := SearchResponse{
+		Addresses: []*models.Address{&out.Address},
+	}
 
 	g.OutputJSON(w, searchResponse)
 }

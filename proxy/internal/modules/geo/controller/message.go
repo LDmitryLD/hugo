@@ -1,12 +1,14 @@
 package controller
 
+import "projects/LDmitryLD/hugoproxy/proxy/internal/models"
+
 type GeocodeRequest struct {
 	Lat string `json:"lat"`
 	Lng string `json:"lng"`
 }
 
 type GeocodeResponse struct {
-	Addresses []*Address `json:"addresses"`
+	Addresses []*models.Address `json:"addresses"`
 }
 
 type SearchRequest struct {
@@ -14,12 +16,7 @@ type SearchRequest struct {
 }
 
 type SearchResponse struct {
-	Addresses []*Address `json:"addresses"`
-}
-
-type Address struct {
-	Lat string `json:"lat"`
-	Lon string `json:"lon"`
+	Addresses []*models.Address `json:"addresses"`
 }
 
 type Suggestions struct {
