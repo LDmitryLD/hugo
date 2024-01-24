@@ -11,11 +11,11 @@ import (
 )
 
 type Geo struct {
-	storage storage.GeoStorage
+	storage storage.GeoStorager
 }
 
-func NewGeo() Georer {
-	return &Geo{}
+func NewGeo(storage storage.GeoStorager) Georer {
+	return &Geo{storage: storage}
 }
 
 func (g *Geo) SearchAddresses(in SearchAddressesIn) SearchAddressesOut {

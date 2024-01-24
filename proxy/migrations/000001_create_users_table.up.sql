@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS search_history(
     id SERIAL PRIMARY KEY,
-    query TEXT
+    query TEXT UNIQUE
 );
 
 CREATE TABLE IF NOT EXISTS address(
@@ -11,8 +11,10 @@ CREATE TABLE IF NOT EXISTS address(
 
 CREATE TABLE IF NOT EXISTS history_search_address(
     id SERIAL PRIMARY KEY,
-    search_id INT,
-    address_id INT,
-    FOREIGN KEY (search_id) REFERENCES search_history(id),
-    FOREIGN KEY (address_id) REFERENCES address(id)
+    search_id INT REFERENCES search_history(id),
+    address_id INT REFERENCES address(id)
+    -- FOREIGN KEY (search_id) REFERENCES search_history(id),
+    -- FOREIGN KEY (address_id) REFERENCES address(id)
 );
+
+CREATE EXTENSION IF NOT EXISTS fuzzystrmatch;

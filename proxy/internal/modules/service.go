@@ -3,6 +3,7 @@ package modules
 import (
 	aservice "projects/LDmitryLD/hugoproxy/proxy/internal/modules/auth/service"
 	geoservice "projects/LDmitryLD/hugoproxy/proxy/internal/modules/geo/service"
+	"projects/LDmitryLD/hugoproxy/proxy/internal/storages"
 )
 
 type Services struct {
@@ -10,9 +11,12 @@ type Services struct {
 	Auth aservice.Auther
 }
 
-func NewSrvices() *Services {
+func NewSrvices(storages *storages.Storages) *Services {
+	aService := aservice.NewAuth()
+	geoService := geoservice.NewGeo(storages.Geo)
+
 	return &Services{
-		Geo:  geoservice.NewGeo(),
-		Auth: aservice.NewAuth(),
+		Geo:  geoService,
+		Auth: aService,
 	}
 }

@@ -44,7 +44,9 @@ func TestGeo_Geocode(t *testing.T) {
 }
 
 func TestGeo_Geocode_BadRequest(t *testing.T) {
-	geo := NewGeoController(service.NewGeo())
+	geo := GeoController{
+		Responder: &responder.Respond{},
+	}
 
 	req := map[string]interface{}{"lat": 123}
 	reqJSON, _ := json.Marshal(req)

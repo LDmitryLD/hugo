@@ -9,19 +9,60 @@ services:
       - "./hugo:/src"
     ports:
       - "1313:1313"
-    networks:
-      - mylocal
+    # networks:
+    #   - mylocal
 
   proxy:
-    build: ./proxy
+    restart: on-failure
     container_name: proxy
+    build: ./proxy
+    command: ./main
     volumes:
       - "./hugo/content:/app/static"
     ports:
       - "8080:8080"
-    networks:
-      - mylocal
+    environment:
+      DB_DRIVER: ${DB_DRIVER}  
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_USER: ${DB_USER}
+      DB_NAME: ${DB_NAME}
+      DB_PORT: ${DB_PORT}
+      DB_HOST: ${DB_HOST}
+    env_file:
+      - .env
+    depends_on:
+      - db
 
-networks:
-  mylocal:
-    driver: bridge
+  db:
+    image: postgres 
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}       
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_DB: ${DB_NAME}
+    env_file:
+      - .env
+    ports:
+      - "5432:5432"    
+
+  migrator:
+    image: migrate/migrate
+    volumes:
+      - ./proxy/migrations:/migrations 
+    entrypoint:
+      [
+        "migrate",
+        "-path",
+        "/migrations",
+        "-database",
+        "postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable",
+      ]    
+    command: ["up"]   
+    depends_on:
+      - db
+    restart: on-failure
+    # networks:
+    #   - mylocal
+
+# networks:
+#   mylocal:
+#     driver: bridge
