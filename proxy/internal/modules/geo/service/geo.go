@@ -30,17 +30,16 @@ func (g *Geo) SearchAddresses(in SearchAddressesIn) SearchAddressesOut {
 		}
 
 		if err = g.storage.Insert(in.Query, res.Lat, res.Lon); err != nil {
-			log.Println("ошибка при кэшировании данных:", err.Error())
+			log.Println("ошибка при добавлении данных в бд:", err.Error())
+		} else {
+			log.Println("Данные добавлены в бд")
 		}
-
-		log.Println("Данные закэшированны")
 
 		return SearchAddressesOut{
 			Address: res,
 		}
 	}
 
-	log.Println("исползуем данные из кэша")
 	return SearchAddressesOut{
 		Address: address,
 		Err:     nil,

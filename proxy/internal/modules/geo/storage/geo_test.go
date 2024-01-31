@@ -9,10 +9,10 @@ import (
 )
 
 var (
-	query   = "test"
-	lat     = "10"
-	lon     = "15"
-	address = models.Address{
+	query       = "test"
+	lat         = "10"
+	lon         = "15"
+	testAddress = models.Address{
 		Lat: "10",
 		Lon: "15",
 	}
@@ -20,14 +20,14 @@ var (
 
 func TestGeoStorage_Select(t *testing.T) {
 	adapterMock := mocks.NewSQLAdapterer(t)
-	adapterMock.On("Select", query).Return(address, nil)
+	adapterMock.On("Select", query).Return(testAddress, nil)
 
 	geo := NewGeoStorage(adapterMock)
 
 	res, err := geo.Select(query)
 
 	assert.Nil(t, err)
-	assert.Equal(t, address, res)
+	assert.Equal(t, testAddress, res)
 }
 
 func TestGeoStorage_Insert(t *testing.T) {

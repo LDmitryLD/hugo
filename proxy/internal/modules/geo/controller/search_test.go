@@ -42,22 +42,6 @@ func TestGeo_Search(t *testing.T) {
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 }
 
-// func TestGeo_Search_BadRequest(t *testing.T) {
-// 	geo := NewGeoController(service.NewGeo())
-
-// 	req := map[string]interface{}{"query": 123}
-// 	reqJSON, _ := json.Marshal(req)
-
-// 	s := httptest.NewServer(http.HandlerFunc(geo.Search))
-
-// 	resp, err := http.Post(s.URL, "application/json", bytes.NewBuffer(reqJSON))
-// 	if err != nil {
-// 		t.Fatal("ошибка при выполнении тестового запроса:", err.Error())
-// 	}
-
-// 	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
-// }
-
 func TestGeo_Search_Error(t *testing.T) {
 
 	geoMock := mocks.NewGeorer(t)

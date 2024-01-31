@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -14,6 +15,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/go-redis/redis"
 	_ "github.com/lib/pq"
 )
 
@@ -24,7 +26,17 @@ func main() {
 		log.Fatal("ошибка при инициализации БД:", err)
 	}
 
-	storages := storages.NewStorages(sqlAdapter)
+	cach := redis.NewClient(&redis.Options{
+		Addr: "localhost:6379",
+	})
+
+	pong, err := cach.Ping().Result()
+	if err != nil {
+		fmt.Println("ошибка соединения с Redis:", err)
+	}
+	fmt.Println("соединение с Redis успешно:", pong)
+
+	storages := storages.NewStorages(sqlAdapter, cach)
 
 	services := modules.NewSrvices(storages)
 

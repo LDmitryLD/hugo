@@ -13,8 +13,6 @@ CREATE TABLE IF NOT EXISTS history_search_address(
     id SERIAL PRIMARY KEY,
     search_id INT REFERENCES search_history(id),
     address_id INT REFERENCES address(id)
-    -- FOREIGN KEY (search_id) REFERENCES search_history(id),
-    -- FOREIGN KEY (address_id) REFERENCES address(id)
 );
 
 CREATE EXTENSION IF NOT EXISTS fuzzystrmatch;
