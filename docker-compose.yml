@@ -60,8 +60,13 @@ services:
     depends_on:
       - db
     restart: on-failure
-    # networks:
-    #   - mylocal
+    
+  redis:
+    image: redis
+    container_name: redis
+    ports:
+      - "6378:6378"
+  
 
 # networks:
 #   mylocal:

@@ -27,7 +27,7 @@ func main() {
 	}
 
 	cach := redis.NewClient(&redis.Options{
-		Addr: "localhost:6379",
+		Addr: "localhost:6378",
 	})
 
 	pong, err := cach.Ping().Result()
