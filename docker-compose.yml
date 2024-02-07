@@ -22,7 +22,7 @@ services:
     ports:
       - "8080:8080"
       - "6060:6060"
-      - "9090:9090"
+      # - "9090:9090"
     environment:
       DB_DRIVER: ${DB_DRIVER}  
       DB_PASSWORD: ${DB_PASSWORD}
@@ -68,8 +68,24 @@ services:
     container_name: redis
     ports:
       - "6378:6378"
-  
 
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"  
+
+  grafana1:
+    image: ldmitryld/grafana:latest
+    ports:
+      - "3000:3000"    
+    volumes:
+      - grafana-data:/var/lib/grafana
+
+volumes:
+  grafana-data:       
+  
 # networks:
 #   mypprof:
 #     driver: bridge
