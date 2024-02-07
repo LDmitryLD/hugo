@@ -5,10 +5,23 @@ import (
 	"log"
 	"projects/LDmitryLD/hugoproxy/proxy/internal/models"
 	"projects/LDmitryLD/hugoproxy/proxy/internal/modules/geo/storage"
+	"time"
 
 	"github.com/ekomobile/dadata/v2"
 	"github.com/ekomobile/dadata/v2/client"
+	"github.com/prometheus/client_golang/prometheus"
 )
+
+var (
+	GeoControllerSearchAPIDuration = prometheus.NewHistogram(prometheus.HistogramOpts{
+		Name: "geo_controller_search_api_request_duration_seconds",
+		Help: "Request to API duration in seconds",
+	})
+)
+
+func init() {
+	prometheus.MustRegister(GeoControllerSearchAPIDuration)
+}
 
 type Geo struct {
 	storage storage.GeoStorager
@@ -47,6 +60,8 @@ func (g *Geo) SearchAddresses(in SearchAddressesIn) SearchAddressesOut {
 }
 
 func searchFromAPI(query string) (models.Address, error) {
+	startTime := time.Now()
+
 	api := dadata.NewCleanApi(client.WithCredentialProvider(&client.Credentials{
 		ApiKeyValue:    "d538755936a28def6bca48517dd287303cb0dae7",
 		SecretKeyValue: "81081aa1fa5ca90caa8a69b14947b5876f58b8db",
@@ -56,6 +71,9 @@ func searchFromAPI(query string) (models.Address, error) {
 	if err != nil {
 		return models.Address{}, err
 	}
+
+	durations := time.Since(startTime).Seconds()
+	GeoControllerSearchAPIDuration.Observe(durations)
 
 	res := models.Address{
 		Lat: addresses[0].GeoLat,

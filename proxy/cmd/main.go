@@ -51,6 +51,16 @@ func main() {
 		Handler: router.NewPprof(controllers),
 	}
 
+	// servProm := http.Server{
+	// 	Addr:    ":9090",
+	// 	Handler: router.NewPrometheus(),
+	// }
+
+	// go func() {
+	// 	log.Println("prometheus started")
+	// 	log.Println(servProm.ListenAndServe())
+	// }()
+
 	go func() {
 		log.Println("pprof started")
 		log.Println(servPprof.ListenAndServe())

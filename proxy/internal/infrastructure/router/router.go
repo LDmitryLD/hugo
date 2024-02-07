@@ -8,6 +8,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/jwtauth/v5"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 func NewRouter(controllers *modules.Controllers) *chi.Mux {
@@ -18,6 +19,7 @@ func NewRouter(controllers *modules.Controllers) *chi.Mux {
 	r.Use(revProxy.ReverseProxy)
 
 	r.HandleFunc("/api/*", controllers.Geo.ApiHandler)
+	r.Handle("/metrics", promhttp.Handler())
 
 	r.Post("/api/login", controllers.Auth.Login)
 	r.Post("/api/register", controllers.Auth.Register)
@@ -56,3 +58,11 @@ func NewPprof(controllers *modules.Controllers) *chi.Mux {
 
 	return r
 }
+
+// func NewPrometheus() *chi.Mux {
+// 	r := chi.NewRouter()
+
+// 	r.Handle("/metrics", promhttp.Handler())
+
+// 	return r
+// }

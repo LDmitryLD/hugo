@@ -22,7 +22,13 @@ func NewGeoStorageProxy(storage *GeoStorage, cache *redis.Client) GeoStorager {
 }
 
 func (g *GeoStorageProxy) Select(query string) (models.Address, error) {
+	startTime := time.Now()
+
 	data, err := g.cache.Get(query).Result()
+
+	duration := time.Since(startTime).Seconds()
+	GeoControllerSearchCacheDuration.Observe(duration)
+
 	if err == nil {
 		var address models.Address
 
