@@ -21,6 +21,7 @@ services:
       - "./hugo/content:/app/static"
     ports:
       - "8080:8080"
+      - "6060:6060"
     environment:
       DB_DRIVER: ${DB_DRIVER}  
       DB_PASSWORD: ${DB_PASSWORD}
@@ -69,5 +70,7 @@ services:
   
 
 # networks:
-#   mylocal:
+#   mypprof:
 #     driver: bridge
+   
+      

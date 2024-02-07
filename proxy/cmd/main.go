@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	_ "net/http/pprof"
 	"os"
 	"os/signal"
 	"projects/LDmitryLD/hugoproxy/proxy/config"
@@ -20,6 +21,7 @@ import (
 )
 
 func main() {
+
 	confDB := config.NewAppConf().DB
 	_, sqlAdapter, err := db.NewSqlDB(confDB)
 	if err != nil {
@@ -43,6 +45,16 @@ func main() {
 	controllers := modules.NewControllers(services)
 
 	r := router.NewRouter(controllers)
+
+	servPprof := http.Server{
+		Addr:    ":6060",
+		Handler: router.NewPprof(controllers),
+	}
+
+	go func() {
+		log.Println("pprof started")
+		log.Println(servPprof.ListenAndServe())
+	}()
 
 	s := &http.Server{
 		Addr:    ":8080",
