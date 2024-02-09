@@ -29,40 +29,21 @@ func NewRouter(controllers *modules.Controllers) *chi.Mux {
 
 		r.Post("/api/address/search", controllers.Geo.Search)
 		r.Post("/api/address/geocode", controllers.Geo.Geocode)
+
+		r.Route("/debug/pprof", func(r chi.Router) {
+			r.HandleFunc("/", pprof.Index)
+			r.HandleFunc("/cmdline", pprof.Cmdline)
+			r.HandleFunc("/profile", pprof.Profile)
+			r.HandleFunc("/symbol", pprof.Symbol)
+			r.HandleFunc("/trace", pprof.Trace)
+			r.Handle("/allocs", pprof.Handler("allocs"))
+			r.Handle("/block", pprof.Handler("block"))
+			r.Handle("/goroutine", pprof.Handler("goroutine"))
+			r.Handle("/mutex", pprof.Handler("mutex"))
+			r.Handle("/heap", pprof.Handler("heap"))
+			r.Handle("/threadcreate", pprof.Handler("threadcreate"))
+		})
 	})
 
 	return r
 }
-
-func NewPprof(controllers *modules.Controllers) *chi.Mux {
-	r := chi.NewRouter()
-
-	r.Post("/debug/login", controllers.Auth.Login)
-	r.Post("/debug/register", controllers.Auth.Register)
-	r.Group(func(r chi.Router) {
-		r.Use(jwtauth.Verifier(aservice.TokenAuth))
-		r.Use(jwtauth.Authenticator(aservice.TokenAuth))
-
-		r.HandleFunc("/debug/pprof/", pprof.Index)
-		r.HandleFunc("/debug/pprof/cmdline", pprof.Cmdline)
-		r.HandleFunc("/debug/pprof/profile", pprof.Profile)
-		r.HandleFunc("/debug/pprof/symbol", pprof.Symbol)
-		r.HandleFunc("/debug/pprof/trace", pprof.Trace)
-		r.Handle("/debug/pprof/allocs", pprof.Handler("allocs"))
-		r.Handle("/debug/pprof/block", pprof.Handler("block"))
-		r.Handle("/debug/pprof/goroutine", pprof.Handler("goroutine"))
-		r.Handle("/debug/pprof/mutex", pprof.Handler("mutex"))
-		r.Handle("/debug/pprof/heap", pprof.Handler("heap"))
-		r.Handle("/debug/pprof/threadcreate", pprof.Handler("threadcreate"))
-	})
-
-	return r
-}
-
-// func NewPrometheus() *chi.Mux {
-// 	r := chi.NewRouter()
-
-// 	r.Handle("/metrics", promhttp.Handler())
-
-// 	return r
-// }
