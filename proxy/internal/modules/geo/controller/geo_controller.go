@@ -67,8 +67,10 @@ func (g *GeoController) Geocode(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	geo := g.geo.GeoCode(service.GeoCodeIn{Lat: geocodeRequest.Lat, Lng: geocodeRequest.Lng})
+
 	geocodeResponse := GeocodeResponse{
-		Addresses: []*models.Address{{Lat: geocodeRequest.Lat, Lon: geocodeRequest.Lng}},
+		Addresses: []*models.Address{{Lat: geo.Lat, Lon: geo.Lng}},
 	}
 
 	g.OutputJSON(w, geocodeResponse)

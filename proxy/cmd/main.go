@@ -1,74 +1,80 @@
 package main
 
 import (
-	"context"
-	"fmt"
 	"log"
-	"net/http"
 	_ "net/http/pprof"
 	"os"
-	"os/signal"
 	"projects/LDmitryLD/hugoproxy/proxy/config"
-	"projects/LDmitryLD/hugoproxy/proxy/internal/db"
-	"projects/LDmitryLD/hugoproxy/proxy/internal/infrastructure/router"
-	"projects/LDmitryLD/hugoproxy/proxy/internal/modules"
-	"projects/LDmitryLD/hugoproxy/proxy/internal/storages"
-	"syscall"
-	"time"
+	"projects/LDmitryLD/hugoproxy/proxy/run"
 
-	"github.com/go-redis/redis"
 	_ "github.com/lib/pq"
 )
 
 func main() {
 
-	confDB := config.NewAppConf().DB
-	_, sqlAdapter, err := db.NewSqlDB(confDB)
-	if err != nil {
-		log.Fatal("ошибка при инициализации БД:", err)
+	// err := godotenv.Load()
+	// if err != nil {
+	// 	log.Println("ошибка при чтени .env файла:", err)
+	// }
+
+	conf := config.NewAppConf()
+
+	conf.Init()
+
+	app := run.NewApp(conf)
+
+	if err := app.Bootstrap().Run(); err != nil {
+		log.Printf("error: %s", err.Error())
+		os.Exit(2)
 	}
 
-	cach := redis.NewClient(&redis.Options{
-		Addr: "localhost:6378",
-	})
+	// confDB := config.NewAppConf().DB
+	// _, sqlAdapter, err := db.NewSqlDB(confDB)
+	// if err != nil {
+	// 	log.Fatal("ошибка при инициализации БД:", err)
+	// }
 
-	pong, err := cach.Ping().Result()
-	if err != nil {
-		fmt.Println("ошибка соединения с Redis:", err)
-	}
-	fmt.Println("соединение с Redis успешно:", pong)
+	// cach := redis.NewClient(&redis.Options{
+	// 	Addr: "localhost:6378",
+	// })
 
-	storages := storages.NewStorages(sqlAdapter, cach)
+	// pong, err := cach.Ping().Result()
+	// if err != nil {
+	// 	fmt.Println("ошибка соединения с Redis:", err)
+	// }
+	// fmt.Println("соединение с Redis успешно:", pong)
 
-	services := modules.NewSrvices(storages)
+	// storages := storages.NewStorages(sqlAdapter, cach)
 
-	controllers := modules.NewControllers(services)
+	// services := modules.NewSrvices(storages)
 
-	r := router.NewRouter(controllers)
+	// controllers := modules.NewControllers(services)
 
-	s := &http.Server{
-		Addr:    ":8080",
-		Handler: r,
-	}
+	// r := router.NewRouter(controllers)
 
-	sigChan := make(chan os.Signal, 1)
-	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
+	// s := &http.Server{
+	// 	Addr:    ":8080",
+	// 	Handler: r,
+	// }
 
-	go func() {
-		log.Println("Starting server")
-		if err := s.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Fatal("Server error: ", err.Error())
-		}
-	}()
+	// sigChan := make(chan os.Signal, 1)
+	// signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
 
-	<-sigChan
+	// go func() {
+	// 	log.Println("Starting server")
+	// 	if err := s.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+	// 		log.Fatal("Server error: ", err.Error())
+	// 	}
+	// }()
 
-	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
-	defer cancel()
+	// <-sigChan
 
-	if err := s.Shutdown(ctx); err != nil {
-		log.Fatal(err)
-	}
+	// ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	// defer cancel()
 
-	log.Println("Server stopped")
+	// if err := s.Shutdown(ctx); err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	// log.Println("Server stopped")
 }

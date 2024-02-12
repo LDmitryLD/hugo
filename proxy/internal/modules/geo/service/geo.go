@@ -31,6 +31,13 @@ func NewGeo(storage storage.GeoStorager) Georer {
 	return &Geo{storage: storage}
 }
 
+func (g *Geo) GeoCode(in GeoCodeIn) GeoCodeOut {
+	return GeoCodeOut{
+		Lat: in.Lat,
+		Lng: in.Lng,
+	}
+}
+
 func (g *Geo) SearchAddresses(in SearchAddressesIn) SearchAddressesOut {
 
 	address, err := g.storage.Select(in.Query)

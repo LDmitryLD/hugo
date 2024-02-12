@@ -3,6 +3,7 @@ package modules
 import (
 	authcontroller "projects/LDmitryLD/hugoproxy/proxy/internal/modules/auth/controller"
 	geocontroller "projects/LDmitryLD/hugoproxy/proxy/internal/modules/geo/controller"
+	"projects/LDmitryLD/hugoproxy/proxy/internal/modules/geo/service"
 )
 
 type Controllers struct {
@@ -10,9 +11,9 @@ type Controllers struct {
 	Geo  geocontroller.Georer
 }
 
-func NewControllers(services *Services) *Controllers {
+func NewControllers(services *Services, geoRPC *service.GeoRPC) *Controllers {
 	authcontroller := authcontroller.NewAuth(services.Auth)
-	geoController := geocontroller.NewGeoController(services.Geo)
+	geoController := geocontroller.NewGeoController(geoRPC)
 
 	return &Controllers{
 		Auth: authcontroller,

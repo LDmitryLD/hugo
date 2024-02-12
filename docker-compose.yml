@@ -21,6 +21,7 @@ services:
       - "./hugo/content:/app/static"
     ports:
       - "8080:8080"
+      - "3455:3455"
     environment:
       DB_DRIVER: ${DB_DRIVER}  
       DB_PASSWORD: ${DB_PASSWORD}
@@ -65,7 +66,7 @@ services:
     image: redis
     container_name: redis
     ports:
-      - "6378:6378"
+      - "6379:6379"
 
   prometheus:
     image: prom/prometheus:latest
