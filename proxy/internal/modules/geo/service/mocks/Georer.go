@@ -13,6 +13,20 @@ type Georer struct {
 	mock.Mock
 }
 
+// GeoCode provides a mock function with given fields: in
+func (_m *Georer) GeoCode(in service.GeoCodeIn) service.GeoCodeOut {
+	ret := _m.Called(in)
+
+	var r0 service.GeoCodeOut
+	if rf, ok := ret.Get(0).(func(service.GeoCodeIn) service.GeoCodeOut); ok {
+		r0 = rf(in)
+	} else {
+		r0 = ret.Get(0).(service.GeoCodeOut)
+	}
+
+	return r0
+}
+
 // SearchAddresses provides a mock function with given fields: in
 func (_m *Georer) SearchAddresses(in service.SearchAddressesIn) service.SearchAddressesOut {
 	ret := _m.Called(in)

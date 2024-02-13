@@ -51,3 +51,20 @@ func TestGeo_SearchAddresses2(t *testing.T) {
 	assert.NotEmpty(t, out.Address)
 	assert.Nil(t, out.Err)
 }
+
+func TestGeo_GeoCode(t *testing.T) {
+	geo := Geo{}
+	expect := GeoCodeOut{
+		Lat: lat,
+		Lng: lon,
+	}
+
+	in := GeoCodeIn{
+		Lat: lat,
+		Lng: lon,
+	}
+
+	got := geo.GeoCode(in)
+
+	assert.Equal(t, got, expect)
+}

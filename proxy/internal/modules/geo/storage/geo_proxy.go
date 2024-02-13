@@ -1,12 +1,13 @@
 package storage
 
 import (
+	"context"
 	"encoding/json"
 	"log"
 	"projects/LDmitryLD/hugoproxy/proxy/internal/models"
 	"time"
 
-	"github.com/go-redis/redis"
+	"github.com/redis/go-redis/v9"
 )
 
 type GeoStorageProxy struct {
@@ -24,7 +25,7 @@ func NewGeoStorageProxy(storage *GeoStorage, cache *redis.Client) GeoStorager {
 func (g *GeoStorageProxy) Select(query string) (models.Address, error) {
 	startTime := time.Now()
 
-	data, err := g.cache.Get(query).Result()
+	data, err := g.cache.Get(context.Background(), query).Result()
 
 	duration := time.Since(startTime).Seconds()
 	GeoControllerSearchCacheDuration.Observe(duration)
@@ -52,7 +53,7 @@ func (g *GeoStorageProxy) Select(query string) (models.Address, error) {
 		return models.Address{}, err
 	}
 
-	err = g.cache.Set(query, address, 5*time.Minute).Err()
+	err = g.cache.Set(context.Background(), query, address, 5*time.Minute).Err()
 	if err != nil {
 		log.Println("ошибка при сохранении данных в кэш", err)
 	} else {
@@ -68,7 +69,7 @@ func (g *GeoStorageProxy) Insert(query string, lat string, lon string) error {
 		Lon: lon,
 	}
 
-	err := g.cache.Set(query, address, 5*time.Minute).Err()
+	err := g.cache.Set(context.Background(), query, address, 5*time.Minute).Err()
 	if err != nil {
 		log.Println("ошибка при записи данных кэш")
 	} else {

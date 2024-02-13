@@ -7,6 +7,7 @@ import (
 	"projects/LDmitryLD/hugoproxy/proxy/internal/db/adapter"
 
 	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq"
 )
 
 func NewSqlDB(dbConf config.DB) (*sqlx.DB, *adapter.SQLAdapter, error) {

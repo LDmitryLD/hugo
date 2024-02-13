@@ -1,12 +1,13 @@
 package storage
 
 import (
+	"context"
 	"projects/LDmitryLD/hugoproxy/proxy/internal/db/adapter/mocks"
 	"projects/LDmitryLD/hugoproxy/proxy/internal/models"
 	"testing"
 	"time"
 
-	"github.com/go-redis/redis"
+	"github.com/redis/go-redis/v9"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -30,8 +31,8 @@ func TestGeoStorageProxy_Select_FromCache(t *testing.T) {
 
 	proxy := NewGeoStorageProxy(geoStorage, cache)
 
-	cache.Set(testQuery, testValue, 1*time.Minute)
-	defer cache.Del(testQuery)
+	cache.Set(context.Background(), testQuery, testValue, 1*time.Minute)
+	defer cache.Del(context.Background(), testQuery)
 
 	got, err := proxy.Select(testQuery)
 

@@ -4,7 +4,7 @@ import (
 	"projects/LDmitryLD/hugoproxy/proxy/internal/db/adapter"
 	"projects/LDmitryLD/hugoproxy/proxy/internal/modules/geo/storage"
 
-	"github.com/go-redis/redis"
+	"github.com/redis/go-redis/v9"
 )
 
 type Storages struct {

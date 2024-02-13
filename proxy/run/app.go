@@ -67,8 +67,6 @@ func (a *App) Run() error {
 		return nil
 	})
 
-	// errGroup.Go(func() error {})
-
 	if err := errGroup.Wait(); err != nil {
 		return err
 	}

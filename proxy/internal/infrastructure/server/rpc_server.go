@@ -30,7 +30,7 @@ func (s *ServerRPC) Serve(ctx context.Context) error {
 			chErr <- err
 		}
 
-		log.Println("rpc server started")
+		log.Println("rpc server started on ", s.conf.Port, "  ", l.Addr())
 		var conn net.Conn
 		for {
 			select {
