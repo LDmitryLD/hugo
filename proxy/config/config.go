@@ -85,6 +85,8 @@ func (a *AppConf) Init() {
 	a.Server.ShutdoundTimeout = shutDownTimeout
 
 	a.RPCServer.Port = os.Getenv("RPC_PORT")
+	a.RPCServer.Type = os.Getenv("RPC_PROTOCOL")
 	a.GeoRPC.Host = os.Getenv("GEO_RPC_HOST")
 	a.GeoRPC.Port = os.Getenv("GEO_RPC_PORT")
+
 }

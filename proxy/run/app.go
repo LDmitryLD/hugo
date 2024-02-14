@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"net/rpc"
+	"net/rpc/jsonrpc"
 	"os"
 	"projects/LDmitryLD/hugoproxy/proxy/config"
 	"projects/LDmitryLD/hugoproxy/proxy/internal/db"
@@ -16,8 +17,14 @@ import (
 	"projects/LDmitryLD/hugoproxy/proxy/internal/modules/geo/service"
 	"projects/LDmitryLD/hugoproxy/proxy/internal/storages"
 	"projects/LDmitryLD/hugoproxy/proxy/rpc/geo"
+	"time"
 
 	"golang.org/x/sync/errgroup"
+)
+
+const (
+	rpcProtocol     = "rpc"
+	jsonrpcProtocol = "json-rpc"
 )
 
 type Application interface {
@@ -99,7 +106,10 @@ func (a *App) Bootstrap(options ...interface{}) Runner {
 		log.Fatal("error init geo RPC:", err)
 	}
 
-	a.rpc = server.NewServerRPC(a.conf.RPCServer, RPCServer)
+	a.rpc, err = server.NewServerRPC(a.conf.RPCServer, RPCServer)
+	if err != nil {
+		log.Fatal("error new rpc server:", err)
+	}
 	go func() {
 		err := a.rpc.Serve(context.Background())
 		if err != nil {
@@ -107,11 +117,10 @@ func (a *App) Bootstrap(options ...interface{}) Runner {
 		}
 	}()
 
-	client, err := rpc.Dial("tcp", fmt.Sprintf("%s:%s", a.conf.GeoRPC.Host, a.conf.GeoRPC.Port))
+	client, err := newClient(a.conf.GeoRPC, a.conf.RPCServer.Type)
 	if err != nil {
-		log.Fatal("error init rpc client:", err)
+		log.Fatal("error init client:", err)
 	}
-	log.Println("rpc client connected")
 
 	geoClientRPC := service.NewGeoRPC(client)
 
@@ -127,4 +136,38 @@ func (a *App) Bootstrap(options ...interface{}) Runner {
 	a.srv = server.NewHTTPServer(a.conf.Server, srv)
 
 	return a
+}
+
+func newClient(conf config.GeoRPC, protocol string) (*rpc.Client, error) {
+	var (
+		client *rpc.Client
+		err    error
+		host   = conf.Host
+		port   = conf.Port
+	)
+
+	switch protocol {
+	case rpcProtocol:
+		client, err = rpc.Dial("tcp", fmt.Sprintf("%s:%s", host, port))
+		if err != nil {
+			return nil, err
+		}
+		log.Println("rpc client connected")
+		return client, nil
+
+	case jsonrpcProtocol:
+		// без этого костыля сервер редко успевает запуститься и коннект проваливается
+		time.Sleep(1 * time.Second)
+
+		client, err = jsonrpc.Dial("tcp", fmt.Sprintf("%s:%s", host, port))
+		if err != nil {
+			return nil, err
+		}
+		log.Println("jsonrpc client connected")
+		return client, nil
+
+	default:
+		return nil, fmt.Errorf("invalid protocol %s", protocol)
+	}
+
 }
