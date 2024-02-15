@@ -11,7 +11,7 @@ type Controllers struct {
 	Geo  geocontroller.Georer
 }
 
-func NewControllers(services *Services, geoRPC *service.GeoRPC) *Controllers {
+func NewControllers(services *Services, geoRPC service.Georer) *Controllers {
 	authcontroller := authcontroller.NewAuth(services.Auth)
 	geoController := geocontroller.NewGeoController(geoRPC)
 

@@ -8,12 +8,31 @@ import (
 	"net/rpc"
 	"net/rpc/jsonrpc"
 	"projects/LDmitryLD/hugoproxy/proxy/config"
+	pb "projects/LDmitryLD/hugoproxy/proxy/protos/gen/geogrpc"
+	"projects/LDmitryLD/hugoproxy/proxy/rpc/geo"
+
+	"google.golang.org/grpc"
 )
 
 const (
+	grpcProtocol    = "grpc"
 	rpcProtocol     = "rpc"
 	jsonrpcProtocol = "json-rpc"
 )
+
+func GetServerRPC(conf config.RPCServer, server *rpc.Server, geo *geo.GeoServiceGRPC) (Server, error) {
+
+	switch conf.Type {
+	case grpcProtocol:
+		return NewServerGRPC(conf, geo), nil
+	case rpcProtocol:
+		return NewServerRPC(conf, server)
+	case jsonrpcProtocol:
+		return NewServerRPC(conf, server)
+	default:
+		return nil, fmt.Errorf("invalid protocol")
+	}
+}
 
 type ServerRPC struct {
 	conf config.RPCServer
@@ -110,5 +129,51 @@ func (s *ServerJSONRPC) Serve(ctx context.Context) error {
 	case <-ctx.Done():
 	}
 
+	return err
+}
+
+type ServerGRPC struct {
+	conf config.RPCServer
+	srv  *grpc.Server
+	geo  *geo.GeoServiceGRPC
+}
+
+func NewServerGRPC(conf config.RPCServer, geo *geo.GeoServiceGRPC) Server {
+	return &ServerGRPC{
+		conf: conf,
+		srv:  grpc.NewServer(),
+		geo:  geo,
+	}
+}
+
+func (s *ServerGRPC) Serve(ctx context.Context) error {
+	var err error
+
+	chErr := make(chan error)
+	go func() {
+		var l net.Listener
+		l, err = net.Listen("tcp", fmt.Sprintf(":%s", s.conf.Port))
+		if err != nil {
+			log.Println("gRPC server register error:", err)
+			chErr <- err
+		}
+
+		log.Println("gRPC server started on ", s.conf.Port)
+
+		pb.RegisterGeorerServer(s.srv, s.geo)
+
+		if err = s.srv.Serve(l); err != nil {
+			log.Println("grpc server error: ", err)
+			chErr <- err
+		}
+
+	}()
+
+	select {
+	case <-chErr:
+		return err
+	case <-ctx.Done():
+		s.srv.GracefulStop()
+	}
 	return err
 }

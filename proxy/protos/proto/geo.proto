@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package geogrpc;
+
+option go_package = "/geogrpc";
+
+service Georer {
+    rpc SearchAddresses(SearchAddressesRequest) returns (SearchAddressesResponse);
+    rpc GeoCode(GeoCodeRequest) returns (GeoCodeResponse);
+}
+
+message SearchAddressesRequest {
+    string query = 1;
+}
+
+message SearchAddressesResponse {
+    Address address = 1;
+    string err = 2;
+}
+
+message GeoCodeRequest {
+    string lat = 1;
+    string lng = 2;
+}
+
+message GeoCodeResponse {
+    string lat = 1;
+    string lng = 2;
+    string err = 3;
+}
+
+message Address {
+    string lat = 1;
+    string lon = 2;
+}
+
