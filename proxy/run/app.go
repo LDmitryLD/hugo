@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"net/rpc"
 	"os"
 	"projects/LDmitryLD/hugoproxy/proxy/config"
 	"projects/LDmitryLD/hugoproxy/proxy/internal/db"
@@ -15,7 +14,6 @@ import (
 	"projects/LDmitryLD/hugoproxy/proxy/internal/modules"
 	"projects/LDmitryLD/hugoproxy/proxy/internal/modules/geo/service"
 	"projects/LDmitryLD/hugoproxy/proxy/internal/storages"
-	"projects/LDmitryLD/hugoproxy/proxy/rpc/geo"
 
 	"golang.org/x/sync/errgroup"
 )
@@ -93,17 +91,23 @@ func (a *App) Bootstrap(options ...interface{}) Runner {
 	services := modules.NewSrvices(newStorages)
 	a.Services = services
 
-	geoRPC := geo.NewGeoServiceRPC(a.Services.Geo)
-	RPCServer := rpc.NewServer()
-	err = RPCServer.Register(geoRPC)
-	if err != nil {
-		log.Fatal("error init geo RPC:", err)
-	}
+	// geoRPC := geo.NewGeoServiceRPC(a.Services.Geo)
+	// RPCServer := rpc.NewServer()
+	// err = RPCServer.Register(geoRPC)
+	// if err != nil {
+	// 	log.Fatal("error init geo RPC:", err)
+	// }
 
-	a.rpc, err = server.GetServerRPC(a.conf.RPCServer, RPCServer, geo.NewGeoServiceGRPC(a.Services.Geo))
+	// a.rpc, err = server.GetServerRPC(a.conf.RPCServer, RPCServer, geo.NewGeoServiceGRPC(a.Services.Geo))
+	// if err != nil {
+	// 	log.Fatal("error init rpc server:", err)
+	// }
+
+	a.rpc, err = server.GetServerRPC(a.conf.RPCServer, a.Services.Geo)
 	if err != nil {
 		log.Fatal("error init rpc server:", err)
 	}
+
 	go func() {
 		err := a.rpc.Serve(context.Background())
 		if err != nil {
@@ -113,7 +117,7 @@ func (a *App) Bootstrap(options ...interface{}) Runner {
 
 	geoClientRPC, err := service.GetlientRPC(protocol, a.conf.GeoRPC)
 	if err != nil {
-		log.Println("error init client:", err)
+		log.Fatal("error init client:", err)
 	}
 
 	controllers := modules.NewControllers(services, geoClientRPC)

@@ -8,6 +8,7 @@ import (
 	"net/rpc"
 	"net/rpc/jsonrpc"
 	"projects/LDmitryLD/hugoproxy/proxy/config"
+	"projects/LDmitryLD/hugoproxy/proxy/internal/modules/geo/service"
 	pb "projects/LDmitryLD/hugoproxy/proxy/protos/gen/geogrpc"
 	"projects/LDmitryLD/hugoproxy/proxy/rpc/geo"
 
@@ -20,15 +21,41 @@ const (
 	jsonrpcProtocol = "json-rpc"
 )
 
-func GetServerRPC(conf config.RPCServer, server *rpc.Server, geo *geo.GeoServiceGRPC) (Server, error) {
+// func GetServerRPC(conf config.RPCServer, server *rpc.Server, geo *geo.GeoServiceGRPC) (Server, error) {
+
+// 	switch conf.Type {
+// 	case grpcProtocol:
+// 		return NewServerGRPC(conf, geo), nil
+// 	case rpcProtocol:
+// 		return NewServerRPC(conf, server)
+// 	case jsonrpcProtocol:
+// 		return NewServerRPC(conf, server)
+// 	default:
+// 		return nil, fmt.Errorf("invalid protocol")
+// 	}
+// }
+
+func GetServerRPC(conf config.RPCServer, geoService service.Georer) (Server, error) {
 
 	switch conf.Type {
 	case grpcProtocol:
-		return NewServerGRPC(conf, geo), nil
+		return NewServerGRPC(conf, geo.NewGeoServiceGRPC(geoService)), nil
 	case rpcProtocol:
-		return NewServerRPC(conf, server)
+		geoRPC := geo.NewGeoServiceRPC(geoService)
+		RPCServer := rpc.NewServer()
+		err := RPCServer.Register(geoRPC)
+		if err != nil {
+			return nil, err
+		}
+		return NewServerRPC(conf, RPCServer)
 	case jsonrpcProtocol:
-		return NewServerRPC(conf, server)
+		geoRPC := geo.NewGeoServiceRPC(geoService)
+		RPCServer := rpc.NewServer()
+		err := RPCServer.Register(geoRPC)
+		if err != nil {
+			return nil, err
+		}
+		return NewServerRPC(conf, RPCServer)
 	default:
 		return nil, fmt.Errorf("invalid protocol")
 	}
